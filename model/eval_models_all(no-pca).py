@@ -1,22 +1,3 @@
-
-import warnings
-
-
-import matplotlib
-matplotlib.use("Agg")
-
-
-"""
-Output: root_model/{alg}/*.models
-root_model/output/result_{alg}.txt
-"""
-warnings.simplefilter("ignore", category=DeprecationWarning)
-
-root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/modelling-file(google-home-mini)/us'
-root_model='/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_new_all/google-home-mini/us'
-
-root_output=root_model+'/output'
-dir_tsne_plots = root_model + '/tsne-plots'
 import os
 import sys
 import pickle
@@ -55,7 +36,7 @@ root_model/output/result_{alg}.txt
 warnings.simplefilter("ignore", category=DeprecationWarning)
 
 root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/modelling-file(philips-bulb)/us'
-root_model='/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_new_all/philips-bulb/us'
+root_model='/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_new_all/philips-bulb-no-pca/us'
 
 root_output=root_model+'/output'
 dir_tsne_plots = root_model + '/tsne-plots'
@@ -165,13 +146,6 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
     print('\t#Total data points: %d ' % num_data_points)
     X_feature = train_data.drop(['device', 'state'], axis=1).fillna(-1)
     X_std = StandardScaler().fit_transform(X_feature)
-    # Create a PCA instance: pca
-    pca = PCA(n_components=20)
-    principalComponents = pca.fit_transform(X_std)
-    features = range(pca.n_components_)
-    # Save components to a DataFrame
-    PCA_components = pd.DataFrame(principalComponents)
-    X_feature = PCA_components.iloc[:,:4]
     device = np.array(train_data.device)[0]
     y_labels = np.array(train_data.state)
     # y_labels, example: on, off, change_color
@@ -381,9 +355,3 @@ def test():
 
 if __name__ == '__main__':
     main()
-num_pools=30
-
-# default_models = ['rf']
-# default_models = ['rf', 'knn']
-#default_models = ['rf', 'knn', 'kmeans', 'dbscan','spectral']
-#default_models = ['knn']

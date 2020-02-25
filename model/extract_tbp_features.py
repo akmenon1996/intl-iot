@@ -21,8 +21,8 @@ INPUT: intermediate files
 OUTPUT: features for RFT models, with device and state labels 
 """
 
-root_exp = 'tagged-intermediate/us'
-root_feature = 'features/us'
+root_exp = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/new-intermediate/us'
+root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/new-features/us'
 
 
 random_ratio=0.8
@@ -107,7 +107,7 @@ def extract_features(intermediate_file, feature_file, group_size, deviceName, st
         return
     col_names = columns_intermediate
     c= columns_state_features
-    pd_obj_all = pd.read_csv(intermediate_file, names=col_names, sep='\t')
+    pd_obj_all = pd.read_csv(intermediate_file, names=col_names, sep='\t',encoding = "ISO-8859-1")
     pd_obj = pd_obj_all.loc[:, ['ts', 'ts_delta', 'frame_len']]
     num_total = len(pd_obj_all)
     if pd_obj is None or num_total < 10:
