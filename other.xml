@@ -1,0 +1,103 @@
+<application>
+  <component name="NodeJsLocalInterpreters">
+    <local-interpreter path="/usr/local/Cellar/node/11.11.0/bin/node">
+      <version-cache version="11.11.0" last-modified="1552196539000" />
+    </local-interpreter>
+    <local-interpreter path="/usr/local/bin/node">
+      <version-cache version="11.11.0" last-modified="1552196539000" />
+    </local-interpreter>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="CommitChangeListDialog.DETAILS_SPLITTER_PROPORTION_2" value="0.7650514" />
+    <property name="CommittedChanges.SplitterProportions.0" value="700" />
+    <property name="CommittedChanges.SplitterProportions.1" value="500" />
+    <property name="Copy.OpenInEditor" value="true" />
+    <property name="DocumentationAutoUpdateEnabled" value="true" />
+    <property name="ExpandBeforeRunStepsPanel" value="true" />
+    <property name="ExpandRunDashboardTypesPanel" value="false" />
+    <property name="InstalledPluginsSearchHistory" value="csv" />
+    <property name="PACKAGE_FILTER" value="opencv-pytho&#10;cv2&#10;tensorflow&#10;keras&#10;flask" />
+    <property name="PluginConfigurable.selectionTab" value="1" />
+    <property name="PyCharm.InitialConfiguration" value="true" />
+    <property name="PyCharm.InitialConfiguration.V2" value="true" />
+    <property name="PyCharm.InitialConfiguration.V3" value="true" />
+    <property name="PyCharm.InitialConfiguration.V4" value="true" />
+    <property name="PyCharm.InitialConfiguration.V5" value="true" />
+    <property name="PyCharm.InitialConfiguration.V6" value="true" />
+    <property name="PyCharm.InitialConfiguration.V7" value="true" />
+    <property name="PyCharm.initialConfigurationShown" value="true" />
+    <property name="SettingsSearchHistory" value="autocomplete&#10;auto" />
+    <property name="ShowDocumentationInToolWindow" value="true" />
+    <property name="SplitFileEditor.Proportion" value="0.34274712" />
+    <property name="TrendingPluginsSearchHistory" value="ki&#10;kite&#10;r markdown&#10;r&#10;npm" />
+    <property name="disable.forced.soft.wraps.notification" value="true" />
+    <property name="evlsprt3.183" value="17" />
+    <property name="file.chooser.recent.files" value="$USER_HOME$/Desktop/GIT_Projects/OpenAI-GYM/env-ai/bin/python3&#10;/Users/abhijit/anaconda3/bin/python3.7&#10;/Users/abhijit/Desktop/GIT_Projects/Flask-Webapp/venv/bin/python3.7&#10;/anaconda3/bin/python3.7&#10;/anaconda3/python.app/Contents/MacOS/python" />
+    <property name="file.gist.reindex.count" value="613845" />
+    <property name="fileTypeChangedCounter" value="5" />
+    <property name="lastTip" value="69" />
+    <property name="quick.doc.font.size" value="SMALL" />
+    <property name="ts.lib.d.ts.version" value="3.2.1" />
+  </component>
+  <component name="PyTestFrameworkService">
+    <option name="SDK_TO_PYTEST">
+      <map>
+        <entry key="$USER_HOME$/.conda/envs/Project/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/Artwork-artist-prediction-webapp/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/CV-webapp/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/Flask-Webapp/venv/bin/python3.7" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/OpenAI-GYM/env-ai/bin/python3" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/Rl_Environments/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/XML_parser_new/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/custom_email_generator/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/neural_net_mod/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/numpy_test/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/stock-prediction/venv/bin/python" value="true" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/thermoAI/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/Semester_4/Parallel ML/Assignment2/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/code-for-boston/clean-slate/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/PycharmProjects/New_project/venv/bin/python" value="true" />
+        <entry key="$USER_HOME$/PycharmProjects/untitled/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/anaconda3/bin/python" value="true" />
+        <entry key="/anaconda3/bin/python3.7" value="true" />
+        <entry key="/usr/local/bin/python3.7" value="false" />
+      </map>
+    </option>
+    <option name="SDK_TO_NOSETEST">
+      <map>
+        <entry key="$USER_HOME$/.conda/envs/Project/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/Artwork-artist-prediction-webapp/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/Flask-Webapp/venv/bin/python3.7" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/OpenAI-GYM/env-ai/bin/python3" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/XML_parser_new/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/custom_email_generator/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/stock-prediction/venv/bin/python" value="true" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/thermoAI/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/code-for-boston/clean-slate/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/PycharmProjects/New_project/venv/bin/python" value="true" />
+        <entry key="$USER_HOME$/PycharmProjects/untitled/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/anaconda3/bin/python" value="true" />
+        <entry key="/anaconda3/bin/python3.7" value="true" />
+        <entry key="/usr/local/bin/python3.7" value="false" />
+      </map>
+    </option>
+    <option name="SDK_TO_TRIALTEST">
+      <map>
+        <entry key="$USER_HOME$/.conda/envs/Project/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/Artwork-artist-prediction-webapp/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/Flask-Webapp/venv/bin/python3.7" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/OpenAI-GYM/env-ai/bin/python3" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/XML_parser_new/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/custom_email_generator/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/stock-prediction/venv/bin/python" value="true" />
+        <entry key="$USER_HOME$/Desktop/GIT_Projects/thermoAI/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/Desktop/code-for-boston/clean-slate/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/PycharmProjects/New_project/venv/bin/python" value="true" />
+        <entry key="$USER_HOME$/PycharmProjects/untitled/venv/bin/python" value="false" />
+        <entry key="$USER_HOME$/anaconda3/bin/python" value="false" />
+        <entry key="/anaconda3/bin/python3.7" value="true" />
+        <entry key="/usr/local/bin/python3.7" value="false" />
+      </map>
+    </option>
+  </component>
+</application>
