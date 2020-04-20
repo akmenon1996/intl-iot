@@ -2,7 +2,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: $0 list_exp.txt  tagged-intermediate/us"
+    echo "Usage: $0 list-devices.txt  tagged-intermediate-new-features-all/us"
 #    echo "       e.g. $0 aux/list_tagged.txt /net/data/meddle/moniotr/tagged-intermediate"
 #    echo "       // e.g. find traffic/us/ -name *.pcap > list_exp.txt"
 #    echo "       Example in tagged-examples.txt"
@@ -23,7 +23,7 @@ extract_pcap(){
         return
     fi
 
-    tshark -r ${pcap_file} -Y ip -Tfields -e frame.number -e frame.time_epoch -e frame.time_delta -e frame.protocols -e frame.len -e eth.src -e eth.dst -e ip.src -e ip.dst -e tcp.srcport -e tcp.dstport -e http.host -e ssl.handshake.extensions_server_name -e udp.srcport -e udp.dstport -E separator=/t > ${txt_file} 2>/dev/null
+    tshark -r ${pcap_file} -Y ip -Tfields -e frame.number -e frame.time_epoch -e frame.time_delta -e frame.protocols -e frame.len -e eth.src -e eth.dst -e ip.src -e ip.dst -e tcp.srcport -e tcp.dstport -e http.host -e udp.srcport -e udp.dstport -E separator=/t > ${txt_file} 2>/dev/null
 
 
     if ! [ -s ${txt_file} ]

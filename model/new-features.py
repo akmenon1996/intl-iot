@@ -11,7 +11,8 @@ columns_intermediate = ['frame_no','ts', 'ts_delta','protocols', 'frame_len', 'e
 
 columns_state_features = [ "meanBytes", "minBytes", "maxBytes", "medAbsDev", "skewLength", "kurtosisLength",
                            "q10", "q20", "q30", "q40", "q50", "q60", "q70", "q80", "q90", "spanOfGroup",
-                           "meanTBP", "varTBP", "medianTBP", "kurtosisTBP", "skewTBP", "device", "state"]
+                           "meanTBP", "varTBP", "medianTBP", "kurtosisTBP", "skewTBP","network_to","network_from",
+                           "network_both","network_to_external","network_local","anonymous_source_destination","device", "state"]
 
 
 # import warnings
@@ -21,8 +22,8 @@ INPUT: intermediate files
 OUTPUT: features for RFT models, with device and state labels 
 """
 
-root_exp = 'tagged-intermediate/us'
-root_feature = 'features/us'
+root_exp = '/Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/model/tagged-intermediate-new-features-all/us'
+root_feature = '/Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/model/new-features-testing1.1-all/us'
 
 
 random_ratio=0.8
@@ -108,7 +109,7 @@ def extract_features(intermediate_file, feature_file, group_size, deviceName, st
     col_names = columns_intermediate
     c= columns_state_features
     pd_obj_all = pd.read_csv(intermediate_file, names=col_names, sep='\t')
-    pd_obj = pd_obj_all.loc[:, ['ts', 'ts_delta', 'frame_len']]
+    pd_obj = pd_obj_all.loc[:, ['ts', 'ts_delta', 'frame_len','ip_src','ip_dst']]
     num_total = len(pd_obj_all)
     if pd_obj is None or num_total < 10:
         return
@@ -138,13 +139,40 @@ def compute_tbp_features(pd_obj, deviceName, state):
     meanTBP = pd_obj.ts_delta.mean()
     varTBP = pd_obj.ts_delta.var()
     medTBP = pd_obj.ts_delta.median()
+    network_to = 0 # Network going to 192.168.10.204, or home.
+    network_from = 0 # Network going from 192.168.10.204, or home.
+    network_both = 0 # Network going to/from 192.168.10.204, or home both present in source.
+    network_local = 0
+    network_to_external = 0 # Network not going to just 192.168.10.248.
+    anonymous_source_destination = 0
+
+
+    for i,j in zip(pd_obj.ip_src,pd_obj.ip_dst):
+        if i == "192.168.10.204":
+            network_from+=1
+        elif j == "192.168.10.204":
+            network_to+=1
+        elif i == "192.168.10.248,192.168.10.204":
+            network_both+=1
+        elif j == "192.168.10.204,129.10.227.248":
+            network_local+=1
+        elif (j!="192.168.10.204" and i!="192.168.10.204"):
+            network_to_external+=1
+        else:
+            anonymous_source_destination+=1
+
+
+
+
 
     d = [meanBytes, minBytes, maxBytes,
          medAbsDev, skewL, kurtL, percentiles[0],
          percentiles[1], percentiles[2], percentiles[3],
          percentiles[4], percentiles[5], percentiles[6],
          percentiles[7], percentiles[8], spanG, meanTBP, varTBP,
-         medTBP, kurtT, skewT, deviceName, state]
+         medTBP, kurtT, skewT,network_to,network_from,
+         network_both,network_to_external,network_local,anonymous_source_destination,
+         deviceName, state]
     return d
 #
 # def test():

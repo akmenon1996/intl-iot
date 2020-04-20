@@ -103,10 +103,9 @@ if __name__ == "__main__":
   
   parser.add_option_group(graphParser)
 
-
   (options, args) = parser.parse_args()
-  options.hostsFile = options.inputFile
-
+  if options.hostsFile == "":
+    options.hostsFile = options.inputFile
   
   devices = Device.Devices(options.deviceList)
  
@@ -148,7 +147,7 @@ if __name__ == "__main__":
   if options.findDiff:
     de.loadDiffIPFor("eth")
   else:
-   de.loadIPFor("erh")
+   de.loadIPFor("eth")
   de.loadDomains()
   de.exportDataRows(options.outputFile)
   #sys.exit()
@@ -162,3 +161,4 @@ if __name__ == "__main__":
   Utils.sysUsage("Plots generated")
 
   sys.exit()
+  

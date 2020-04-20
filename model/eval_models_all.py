@@ -1,22 +1,6 @@
-
 import warnings
-
-
 import matplotlib
 matplotlib.use("Agg")
-
-
-"""
-Output: root_model/{alg}/*.models
-root_model/output/result_{alg}.txt
-"""
-warnings.simplefilter("ignore", category=DeprecationWarning)
-
-root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/modelling-file(google-home-mini)/us'
-root_model='/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_new_all/google-home-mini/us'
-
-root_output=root_model+'/output'
-dir_tsne_plots = root_model + '/tsne-plots'
 import os
 import sys
 import pickle
@@ -54,23 +38,23 @@ root_model/output/result_{alg}.txt
 """
 warnings.simplefilter("ignore", category=DeprecationWarning)
 
-root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/modelling-file(philips-bulb)/us'
-root_model='/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_new_all/philips-bulb/us'
+root_feature = '/Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/model/new-features-testing1.1-all/us'
+root_model='/Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/models_new_all/features-testing1.1-all/us'
 
 root_output=root_model+'/output'
 dir_tsne_plots = root_model + '/tsne-plots'
 
-num_pools=30
+num_pools=12
 
 # default_models = ['rf']
 # default_models = ['rf', 'knn']
-# default_models = ['rf', 'knn', 'kmeans', 'dbscan','spectral']
-default_models = ['knn']
+default_models = ['rf', 'knn', 'kmeans', 'dbscan','spectral']
+# default_models = ['knn']
 
 
 
 def main():
-    test()
+    #test()
     global root_feature, root_model, root_output, dir_tsne_plots
     if len(sys.argv) == 3:
         root_feature = sys.argv[1]
@@ -100,6 +84,7 @@ def train_models():
     ldnames = []
     for csv_file in os.listdir(root_feature):
         if csv_file.endswith('.csv'):
+            print(csv_file)
             train_data_file = '%s/%s' % (root_feature, csv_file)
             dname = csv_file[:-4]
             lfiles.append(train_data_file)
@@ -153,7 +138,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
         list_models_todo.append(model_alg)
 
     if len(list_models_todo) < 1:
-        print('    skip %s, all models trained for alg: %s' % (dname, str(list_all_models)))
+        print('skip %s, all models trained for alg: %s' % (dname, str(list_all_models)))
         return
     print('Training %s using algorithm(s): %s' %  (dname, str(list_models_todo)))
     train_data = pd.read_csv(train_data_file)
@@ -367,7 +352,7 @@ def test():
     """
     Test in JJ's local laptop
     """
-    if pc_name == 'JMac.local':
+    if pc_name == 'Abhijits-MBP-2.fios-router.home':
         # train_individual_device('/net/data/meddle/moniotr/tagged-features/cloudcam.csv',
         # '/net/data/meddle/moniotr/tagged-models/cloudcam.model')
         global root_model, dir_tsne_plots, num_pools, root_output
@@ -381,9 +366,6 @@ def test():
 
 if __name__ == '__main__':
     main()
-num_pools=30
+    num_pools=12
 
-# default_models = ['rf']
-# default_models = ['rf', 'knn']
-#default_models = ['rf', 'knn', 'kmeans', 'dbscan','spectral']
-#default_models = ['knn']
+
