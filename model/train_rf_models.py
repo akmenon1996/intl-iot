@@ -9,8 +9,8 @@ from sklearn.metrics import accuracy_score
 
 import warnings
 warnings.simplefilter("ignore", category=DeprecationWarning)
-root_feature = 'features/us'
-root_model='tagged-models/us'
+root_feature = 'new-features-testing1.1-all/us'
+root_model='tagged-models-new-testing1.1/us'
 output_file=root_model+'/output/train-models.txt'
 
 def main():
@@ -30,6 +30,7 @@ def train_models():
     global root_feature, root_model, output_file
     ff = open(output_file, 'a+')
     for csv_file in os.listdir(root_feature):
+        print(csv_file)
         if csv_file.endswith('.csv'):
             train_data_file = '%s/%s' % (root_feature, csv_file)
             print("Scanning " + train_data_file)
@@ -41,9 +42,11 @@ def train_models():
                 print('  Skip trained %s' % model_file)
                 continue
             _acc_score = train_individual_device(train_data_file, model_file, label_file, res_file)
+            print("Helllllo")
             ff.write('%s\t%s\n' % (dname, _acc_score))
     ff.close()
     print('acc score saved to %s' % output_file)
+
 
 def train_individual_device(train_data_file, model_file, label_file, res_file=None):
     # FutureWarning
@@ -51,9 +54,10 @@ def train_individual_device(train_data_file, model_file, label_file, res_file=No
     warnings.simplefilter("ignore", category=FutureWarning)
     """
     Read from train_data_file of the features 
-        meanBytes,minBytes,maxBytes,medAbsDev,skewLength,kurtosisLength,
-        q10,q20,q30,q40,q50,q60,q70,q80,q90,spanOfGroup,meanTBP,varTBP,
-        medianTBP,kurtosisTBP,skewTBP,device,state
+        meanBytes", "minBytes", "maxBytes", "medAbsDev", "skewLength", "kurtosisLength",
+       "q10", "q20", "q30", "q40", "q50", "q60", "q70", "q80", "q90", "spanOfGroup",
+       "meanTBP", "varTBP", "medianTBP", "kurtosisTBP", "skewTBP","network_to","network_from",
+       "network_both","network_to_external","network_local","anonymous_source_destination","device", "state
     """
     train_data = pd.read_csv(train_data_file)
     if len(train_data) < 1:
@@ -92,9 +96,6 @@ def train_individual_device(train_data_file, model_file, label_file, res_file=No
 
 def test():
     pc_name = os.uname()[1]
-    """
-    Test locally at JJ's Mac
-    """
     if pc_name == 'JMac.local':
         train_individual_device('examples/amcrest-cam-wired.csv',
                                 'examples/amcrest-cam-wired.model',

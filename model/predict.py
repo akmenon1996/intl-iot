@@ -5,36 +5,90 @@ import numpy as np
 import pickle
 import time
 import warnings
+import ntpath
 from sklearn.preprocessing import LabelEncoder
 from scipy.stats import kurtosis
 from scipy.stats import skew
 from statsmodels import robust
+
 dir_online_features = 'online_features'
 columns_intermediate = ['frame_no','ts', 'ts_delta','protocols', 'frame_len', 'eth_src', 'eth_dst',
                         'ip_src', 'ip_dst', 'tcp_srcport', 'tcp_dstport', 'http_host', 'sni', 'udp_srcport', 'udp_dstport']
+
 columns_state_features = [ "meanBytes", "minBytes", "maxBytes", "medAbsDev", "skewLength", "kurtosisLength",
                            "q10", "q20", "q30", "q40", "q50", "q60", "q70", "q80", "q90", "spanOfGroup",
-                           "meanTBP", "varTBP", "medianTBP", "kurtosisTBP", "skewTBP", "device", "state"]
+                           "meanTBP", "varTBP", "medianTBP", "kurtosisTBP", "skewTBP","network_to","network_from",
+                           "network_both","network_to_external","network_local","anonymous_source_destination","device", "state"]
 columns_detect_sequence = ['ts', 'ts_end','ts_delta', 'num_pkt', 'state']
-save_extracted_features=False
+save_extracted_features = False
+
+RED = "\033[31;1m"
+END = "\033[0m"
+
+def usage():
+    print("Usage: python %s device_name pcap_path result_file model_dir\n" % sys.argv[0])
+    print("Uses a model to predict the device activity given network traffic of that device.\n")
+    print("Example: python -W ignore %s yi-camera yi_camera_sample.pcap sample.csv tagged-models/us/\n" % sys.argv[0])
+    print("Arguments:")
+    print("  device_name: The name of the device that is being recorded in the input pcap file")
+    print("  pcap_path Path to the pcap file with unknown network activity")
+    print("  result_file: Path to a CSV file to write results")
+    print("  model_dir: Path to the directory containing the model of device_name")
+    exit(0)
 
 def main():
     global dir_models
-    if len(sys.argv) < 5:
-        print('Usage: %s device intermediateFile resultcsvFile dir_models useIntermediate=1|0' % sys.argv[0])
-        print('\tdefault dir_models=%s' % dir_models)
-        exit(0)
+
+    print("Running %s..." % sys.argv[0])
+
+    if len(sys.argv) != 4 and len(sys.argv) != 5:
+        print("%sError: 4 arguments required. %d arguments found.%s" % (RED, (len(sys.argv) - 1), END))
+        usage()
+
     device = sys.argv[1]
-    file_intermediate = sys.argv[2]
+    pcap_path = sys.argv[2]
+    user_intermediates = "user-intermediates/"
     file_result = sys.argv[3]
     dir_models = sys.argv[4]
-    useIntermediate=1
-    if len(sys.argv) > 5:
-        useIntermediate = int(sys.argv[5])
 
-    res=predict(device, file_intermediate)
+    errors = False
+    if not pcap_path.endswith('.pcap'):
+        print("%sError: %s is not a pcap file.%s" % (RED, pcap_path, END))
+        errors = True
+    elif not os.path.isfile(pcap_path):
+        print("%sError: The pcap file %s does not exist!%s" % (RED, pcap_path, END))
+        errors = True
+    if not file_result.endswith('.csv'):
+        print("%sError: Output file %s should be a CSV!%s" % (RED, file_result, END))
+        errors = True
+    if not os.path.isdir(dir_models):
+        print("%sError: The model directory %s does not exist!%s" % (RED, dir_models, END))
+        errors = True
+    else:
+        file_model = '%s/%s.model' % (dir_models, device)
+        file_labels = '%s/%s.label.txt' % (dir_models, device)
+        if not os.path.isfile(file_model):
+            print("%sError: The model file %s cannot be found. Please regenerate file, check directory name, or check device name.%s" % (RED, file_model, END))
+            errors = True
+        if not os.path.isfile(file_labels):
+            print("%sError: The label file %s cannot be found. Please regenerate file, check directory name, or check device name.%s" % (RED, file_labels, END))
+            errors = True
 
-    if res is None or len(res)==0:
+    if errors:
+        usage()
+
+    if not os.path.exists(user_intermediates):
+        os.system('mkdir -pv %s' % user_intermediates)
+    file_intermediate = user_intermediates + "/" + ntpath.basename(pcap_path)[:-4] + "txt"
+    if os.path.isfile(file_intermediate):
+        print("%s exists. Delete it to reparse the pcap file." % file_intermediate)
+    else:
+        os.system("tshark -r %s -Y ip -Tfields -e frame.number -e frame.time_epoch -e frame.time_delta -e frame.protocols -e frame.len -e eth.src -e eth.dst -e ip.src -e ip.dst -e tcp.srcport -e tcp.dstport -e http.host -e udp.srcport -e udp.dstport -E separator=/t > %s 2>/dev/null" % (pcap_path, file_intermediate))
+
+    os.system('mkdir -pv `dirname %s`' % file_result)
+    res = predict(device, file_intermediate)
+
+    if res is None or len(res) == 0:
         with open(file_result, 'w') as ff:
             ff.write('No behavior found for %s from %s' % (device, file_intermediate))
     else:
@@ -48,7 +102,7 @@ def predict(device, file_intermediate):
     if model is None:
         return
     res_detect = detect_states(file_intermediate, model, labels, device)
-    print('Result:')
+    print('Results:')
     print(res_detect)
     return res_detect
 
@@ -68,8 +122,8 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
     # print('===== pd_obj_all head() ======')
     # print(pd_obj_all.head())
     # print('')
-    pd_obj = pd_obj_all.loc[:, ['ts', 'ts_delta', 'frame_len']]
-    if pd_obj is None or len(pd_obj) < 1:
+    pd_obj = pd_obj_all.loc[:, ['ts', 'ts_delta', 'frame_len','ip_src','ip_dst']]
+    if pd_obj is None or len(pd_obj) < 1: #Nothing in decoded input pcap file
         return
     num_total = len(pd_obj_all)
     print('Total packets: %s' % num_total)
@@ -90,9 +144,9 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
     Load sessions, for each session, extract features and construct a dataframe of feature
     """
     print('Number of slices: %s' % len(list_sessions))
-    for i in range(len(list_sessions)-1):
+    for i in range(len(list_sessions) - 1):
         start = list_sessions[i]
-        stop = list_sessions[i+1]
+        stop = list_sessions[i + 1]
         pd_obj = pd_obj_all.iloc[start: stop]
         if len(pd_obj) < group_size:
             # print('error: %s,%s' % (start, stop))
@@ -105,10 +159,10 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
         num_pkt = len(pd_obj)
 
         start_ts_delta = pd_obj.iloc[0].ts_delta
-        list_start_ts_text.append('%s (%s) n=%s' % (start_ts, start_ts_delta, len(pd_obj)))
+        list_start_ts_text.append('%s (%s) n=%s' % (start_ts, start_ts_delta, num_pkt))
 
         end_ts = pd_obj.iloc[num_pkt - 1].ts
-        list_res.append([start_ts, end_ts, start_ts_delta, num_pkt])
+        list_res.append([start_ts, end_ts, start_ts_delta, num_pkt]) #The results that are printed
         d = compute_tbp_features(pd_obj, np.NaN, np.NaN)
         d.extend([start_ts, end_ts, start_ts_delta, num_pkt])
         feature_data = feature_data.append(pd.DataFrame(data=[d], columns=c))
@@ -137,8 +191,8 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
     # print('ypredict:')
     # print(y_predict)
     p_readable = []
-    theta=0.7
-    # print( y_predict.ndim, 'ndim: ')
+    theta = 0.7
+    # print(y_predict.ndim, 'ndim: ')
     # if y_predict.ndim == 1:
     #     return
 
@@ -172,7 +226,7 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
         if not os.path.exists(dir_online_features_device):
             os.makedirs(dir_online_features_device, exist_ok=True)
         feature_file = '%s/%s.csv' % (dir_online_features_device, min_date)
-        # pd_unknown  = pd.concat(list_unknown, ignore_index=True)
+        # pd_unknown = pd.concat(list_unknown, ignore_index=True)
         # print('Write unknown into %s' % feature_file)
         pd_unknown.to_csv(feature_file, index=False)
 
@@ -205,13 +259,35 @@ def compute_tbp_features(pd_obj, deviceName, state):
     meanTBP = pd_obj.ts_delta.mean()
     varTBP = pd_obj.ts_delta.var()
     medTBP = pd_obj.ts_delta.median()
+    network_to = 0  # Network going to 192.168.10.204, or home.
+    network_from = 0  # Network going from 192.168.10.204, or home.
+    network_both = 0  # Network going to/from 192.168.10.204, or home both present in source.
+    network_local = 0
+    network_to_external = 0  # Network not going to just 192.168.10.248.
+    anonymous_source_destination = 0
+
+    for i, j in zip(pd_obj.ip_src, pd_obj.ip_dst):
+        if i == "192.168.10.204":
+            network_from += 1
+        elif j == "192.168.10.204":
+            network_to += 1
+        elif i == "192.168.10.248,192.168.10.204":
+            network_both += 1
+        elif j == "192.168.10.204,129.10.227.248":
+            network_local += 1
+        elif (j != "192.168.10.204" and i != "192.168.10.204"):
+            network_to_external += 1
+        else:
+            anonymous_source_destination += 1
 
     d = [meanBytes, minBytes, maxBytes,
          medAbsDev, skewL, kurtL, percentiles[0],
          percentiles[1], percentiles[2], percentiles[3],
          percentiles[4], percentiles[5], percentiles[6],
          percentiles[7], percentiles[8], spanG, meanTBP, varTBP,
-         medTBP, kurtT, skewT, deviceName, state]
+         medTBP, kurtT, skewT, network_to, network_from,
+         network_both, network_to_external, network_local, anonymous_source_destination,
+         deviceName, state]
     return d
 
 def load_model(dname):
@@ -219,7 +295,7 @@ def load_model(dname):
     file_model = '%s/%s.model' % (dir_models, dname)
     file_labels = '%s/%s.label.txt' % (dir_models, dname)
     if os.path.exists(file_model) and os.path.exists(file_labels):
-        print(file_model)
+        print("Model: %s" % file_model)
         model = pickle.load(open(file_model, 'rb'))
         labels = load_list(file_labels)
         return model, labels

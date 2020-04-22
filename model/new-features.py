@@ -174,14 +174,7 @@ def compute_tbp_features(pd_obj, deviceName, state):
          network_both,network_to_external,network_local,anonymous_source_destination,
          deviceName, state]
     return d
-#
-# def test():
-#     pc = os.uname()[1]
-#     print(pc)
-#     if pc == 'JMac.local':
-#         feature_data=extract_features('../examples/example-unctrl.txt', '../examples/example-unctrl-tbp-features.csv', 10, 'somedevice', 'somestate')
-#         print(feature_data)
-#         exit(0)
+
 
 if __name__ == '__main__':
     main()
