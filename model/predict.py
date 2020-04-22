@@ -10,6 +10,8 @@ from sklearn.preprocessing import LabelEncoder
 from scipy.stats import kurtosis
 from scipy.stats import skew
 from statsmodels import robust
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 dir_online_features = 'online_features'
 columns_intermediate = ['frame_no','ts', 'ts_delta','protocols', 'frame_len', 'eth_src', 'eth_dst',
@@ -179,7 +181,20 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
     # print(extra_cols, 'extra_cols: ')
     # print('==== feature_data ===')
     # print(feature_data)
+    # TODO : Make Model Pipeline more scalable from eval_models_all --> model_pipeline_example.ipynb
     unknown_data = feature_data.drop(extra_cols, axis=1)
+    unknown_data = StandardScaler().fit_transform(unknown_data)
+    unknown_data = pd.DataFrame(unknown_data)
+
+    unknown_data=unknown_data.sample(100, replace=True)
+    pca = PCA(n_components=20)
+    principalComponents = pca.fit_transform(unknown_data)
+    # Save components to a DataFrame
+    PCA_components = pd.DataFrame(principalComponents)
+    unknown_data = PCA_components.iloc[:, :4]
+
+    unknown_data = unknown_data.values[0]
+    unknown_data= unknown_data.reshape(1,-1)
     # print('==== unknown data ==== ')
     # print(unknown_data)
     y_predict = trained_model.predict(unknown_data)

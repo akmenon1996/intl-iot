@@ -38,8 +38,8 @@ root_model/output/result_{alg}.txt
 """
 warnings.simplefilter("ignore", category=DeprecationWarning)
 
-root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/new-features-testing1.1-all/us'
-root_model='/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_new_all/features-testing1.1-all/us'
+root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/features-testing1.1/us'
+root_model='/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_final/features-testing1.1/us'
 
 root_output=root_model+'/output'
 dir_tsne_plots = root_model + '/tsne-plots'
@@ -47,8 +47,8 @@ dir_tsne_plots = root_model + '/tsne-plots'
 num_pools=12
 
 # default_models = ['rf']
-# default_models = ['rf', 'knn']
-default_models = ['rf', 'knn', 'kmeans', 'dbscan','spectral']
+default_models = ['rf', 'knn']
+#default_models = ['rf', 'knn', 'kmeans', 'dbscan','spectral']
 # default_models = ['knn']
 
 
@@ -153,6 +153,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
     # Create a PCA instance: pca
     pca = PCA(n_components=20)
     principalComponents = pca.fit_transform(X_std)
+    pickle.dump(principalComponents)
     features = range(pca.n_components_)
     # Save components to a DataFrame
     PCA_components = pd.DataFrame(principalComponents)
@@ -205,6 +206,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
         """
         if model_alg == 'knn':
             print('  knn: n_neighbors=%s' % num_lables)
+            print(np.shape(X_train))
             trained_model = KNeighborsClassifier(n_neighbors=num_lables)
             trained_model.fit(X_train, y_train_bin)
 
@@ -238,6 +240,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
 
         elif model_alg == 'rf':
             trained_model = RandomForestClassifier(n_estimators=1000, random_state=42)
+            print(np.shape(X_train))
             trained_model.fit(X_train, y_train_bin)
             y_predicted = trained_model.predict(X_test).round()
             # print(y_predicted)
@@ -245,10 +248,6 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
                 y_predicted_1d = y_predicted
             else:
                 y_predicted_1d = np.argmax(y_predicted, axis=1)
-            y_predicted_label = lb.inverse_transform(y_predicted)
-        # print('')
-        # print(y_test_bin_1d)
-        # print(y_predicted_1d)
         _acc_score = accuracy_score(y_test_bin_1d, y_predicted_1d)
         """
         Eval clustering based metrics
@@ -350,7 +349,7 @@ def tsne_plot(X, y, figfile, pp=30):
 def test():
     pc_name = os.uname()[1]
     """
-    Test in JJ's local laptop
+    Test in AKM's local laptop
     """
     if pc_name == 'Abhijits-MBP-2.fios-router.home':
         # train_individual_device('/net/data/meddle/moniotr/tagged-features/cloudcam.csv',
