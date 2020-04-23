@@ -40,8 +40,8 @@ root_model/output/result_{alg}.txt
 """
 warnings.simplefilter("ignore", category=DeprecationWarning)
 
-root_feature = '/Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/model/new-features-testing1.1-all/us'
-root_model = '/Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/models_new_all/features-testing1.1-all/us'
+root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/features-testing1.1/us'
+root_model = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_new_all/features-testing1.1-all/us'
 
 root_output = root_model + '/output'
 dir_tsne_plots = root_model + '/tsne-plots'
@@ -236,15 +236,14 @@ def eval_individual_device(train_data_file, dname, specified_models=None):
         return
     print('\t#Total data points: %d ' % num_data_points)
     X_feature = train_data.drop(['device', 'state'], axis=1).fillna(-1)
-    X_std = StandardScaler().fit_transform(X_feature)
-    # Create a PCA instance: pca
+    ss= StandardScaler()
     pca = PCA(n_components=20)
-    principalComponents = pca.fit_transform(X_std)
-    features = range(pca.n_components_)
+    X_std = ss.fit_transform(X_feature)
+    # Create a PCA instance: pca
+    X_std = pca.fit_transform(X_std)
     # Save components to a DataFrame
-    PCA_components = pd.DataFrame(principalComponents)
-    X_feature = PCA_components.iloc[:, :4]
-    device = np.array(train_data.device)[0]
+    X_std = pd.DataFrame(X_std)
+    X_feature = X_std.iloc[:, :4]
     y_labels = np.array(train_data.state)
     # y_labels, example: on, off, change_color
     """
@@ -261,7 +260,6 @@ def eval_individual_device(train_data_file, dname, specified_models=None):
 
     """
     One hot encoding y labels
-    On Mar 22, 2019: deprecated LabelEncoder + OneHotEncoder
     """
     lb = LabelBinarizer()
     lb.fit(y_labels)  # collect all possible labels
@@ -277,7 +275,7 @@ def eval_individual_device(train_data_file, dname, specified_models=None):
         model_dir = '%s/%s' % (root_model, model_alg)
         if not os.path.exists(model_dir):
             os.system('mkdir -pv %s' % model_dir)
-        model_file = '%s/%s.model' % (model_dir, dname)
+        model_file = f'{model_dir}/{dname}{model_alg}.model'
         label_file = '%s/%s.label.txt' % (model_dir, dname)
         single_outfile = '%s/%s.result.csv' % (model_dir, dname)
         output_file = '%s/result_%s.txt' % (root_output, model_alg)
@@ -332,10 +330,7 @@ def eval_individual_device(train_data_file, dname, specified_models=None):
                 y_predicted_1d = y_predicted
             else:
                 y_predicted_1d = np.argmax(y_predicted, axis=1)
-            y_predicted_label = lb.inverse_transform(y_predicted)
-        # print('')
-        # print(y_test_bin_1d)
-        # print(y_predicted_1d)
+
         _acc_score = accuracy_score(y_test_bin_1d, y_predicted_1d)
         """
         Eval clustering based metrics
@@ -368,7 +363,8 @@ def eval_individual_device(train_data_file, dname, specified_models=None):
         """
         Save the model 
         """
-        pickle.dump(trained_model, open(model_file, 'wb'))
+        model_dictionary = dict({'standard_scaler':ss, 'pca':pca, 'trained_model':trained_model})
+        pickle.dump(model_dictionary, open(model_file, 'wb'))
         """
         Save the label for onehot encoding 
         """

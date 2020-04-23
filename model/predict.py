@@ -1,4 +1,3 @@
-import os
 import sys
 import pandas as pd
 import numpy as np
@@ -6,7 +5,7 @@ import pickle
 import time
 import warnings
 import ntpath
-from sklearn.preprocessing import LabelEncoder
+import os
 from scipy.stats import kurtosis
 from scipy.stats import skew
 from statsmodels import robust
@@ -67,7 +66,10 @@ def main():
         print("%sError: The model directory %s does not exist!%s" % (RED, dir_models, END))
         errors = True
     else:
-        file_model = '%s/%s.model' % (dir_models, device)
+        for file in os.listdir(dir_models):
+            if file.endswith(".model"):
+                print(file)
+                file_model = f'{dir_models}/{file}'
         file_labels = '%s/%s.label.txt' % (dir_models, device)
         if not os.path.isfile(file_model):
             print("%sError: The model file %s cannot be found. Please regenerate file, check directory name, or check device name.%s" % (RED, file_model, END))
@@ -115,15 +117,14 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
         print('reading from %s' % intermediate_file)
         return
     feature_file = None
-
+    ss = trained_model['standard_scaler']
+    pca = trained_model['pca']
+    trained_model = trained_model['trained_model']
     col_names = columns_intermediate
     c = columns_state_features.copy()
     col_data_points = ['ts', 'ts_end','ts_delta', 'num_pkt']
     c.extend(col_data_points)
     pd_obj_all = pd.read_csv(intermediate_file, names=col_names, sep='\t')
-    # print('===== pd_obj_all head() ======')
-    # print(pd_obj_all.head())
-    # print('')
     pd_obj = pd_obj_all.loc[:, ['ts', 'ts_delta', 'frame_len','ip_src','ip_dst']]
     if pd_obj is None or len(pd_obj) < 1: #Nothing in decoded input pcap file
         return
@@ -180,18 +181,10 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
 
     # TODO : Make Model Pipeline more scalable from eval_models_all --> model_pipeline_example.ipynb
     unknown_data = feature_data.drop(extra_cols, axis=1)
-    unknown_data = StandardScaler().fit_transform(unknown_data)
+    unknown_data = ss.transform(unknown_data)
+    unknown_data = pca.transform(unknown_data)
     unknown_data = pd.DataFrame(unknown_data)
-
-    unknown_data=unknown_data.sample(100, replace=True)
-    pca = PCA(n_components=20)
-    principalComponents = pca.fit_transform(unknown_data)
-    # Save components to a DataFrame
-    PCA_components = pd.DataFrame(principalComponents)
-    unknown_data = PCA_components.iloc[:, :4]
-
-    unknown_data = unknown_data.values[0]
-    unknown_data= unknown_data.reshape(1,-1)
+    unknown_data = unknown_data.iloc[:, :4]
     y_predict = trained_model.predict(unknown_data)
     p_readable = []
     theta = 0.7
@@ -292,7 +285,10 @@ def compute_tbp_features(pd_obj, deviceName, state):
 
 def load_model(dname):
     global dir_models
-    file_model = '%s/%s.model' % (dir_models, dname)
+    for file in os.listdir(dir_models):
+        if file.endswith(".model"):
+            print(file)
+            file_model = f'{dir_models}/{file}'
     file_labels = '%s/%s.label.txt' % (dir_models, dname)
     if os.path.exists(file_model) and os.path.exists(file_labels):
         print("Model: %s" % file_model)
