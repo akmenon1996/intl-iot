@@ -1,8 +1,10 @@
 import warnings
 import matplotlib
+
 matplotlib.use("Agg")
 import os
 import sys
+import argparse
 import pickle
 import numpy as np
 import pandas as pd
@@ -26,8 +28,8 @@ import warnings
 from sklearn.cluster import SpectralClustering
 from sklearn.metrics import f1_score
 
-
 import matplotlib
+
 matplotlib.use("Agg")
 from matplotlib import pyplot as plt
 from multiprocessing import Pool
@@ -38,33 +40,116 @@ root_model/output/result_{alg}.txt
 """
 warnings.simplefilter("ignore", category=DeprecationWarning)
 
-root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/features-testing1.1/us'
-root_model='/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_final/features-testing1.1/us'
+root_feature = '/Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/model/new-features-testing1.1-all/us'
+root_model = '/Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/models_new_all/features-testing1.1-all/us'
 
-root_output=root_model+'/output'
+root_output = root_model + '/output'
 dir_tsne_plots = root_model + '/tsne-plots'
 
-num_pools=12
+num_pools = 12
 
 # default_models = ['rf']
-default_models = ['rf', 'knn']
-#default_models = ['rf', 'knn', 'kmeans', 'dbscan','spectral']
+# default_models = ['rf', 'knn']
+default_models = ['rf', 'knn', 'kmeans', 'dbscan', 'spectral']
 # default_models = ['knn']
+model_list = []
 
+RED = "\033[31;1m"
+END = "\033[0m"
+
+usage_stm = """
+Usage: python {prog_name} -f in_features_dir -m out_model_dir [-dknrs]
+
+Trains anaylzed pcap files and produces one or more models using different algorithms
+that can predict device activity.
+
+Example: python {prog_name} -f features/us/ -m tagged-models/us/ -dn
+
+Arguments:
+  -f in_features_dir: Path to a directory containing CSV files of statistically-analyzed
+     pcap files. This option is required.
+  -m out_model_dir: Path to the directory to put the generated models. This directory
+     will be created if it does not exist. This option is required.
+  -d: Produce a model using the dbscan algorithm.
+  -k: Produce a model using the kmeans algorithm.
+  -n: Produce a model using the knn algorithm.
+  -r: Produce a model using the rf algorithm.
+  -s: Produce a model using the spectral algorithm.
+
+  Note: If no model is chosen, all of the models will be produced.
+""".format(prog_name=sys.argv[0])
+
+
+def print_usage():
+    print(usage_stm)
+    exit(0)
 
 
 def main():
-    #test()
-    global root_feature, root_model, root_output, dir_tsne_plots
-    if len(sys.argv) == 3:
-        root_feature = sys.argv[1]
-        root_model = sys.argv[2]
-        root_output = root_model + '/output'
-        dir_tsne_plots = root_model + '/tsne-plots'
+    # test()
+    global root_feature, root_model, root_output, dir_tsne_plots, model_list
+
+    print("Running %s..." % sys.argv[0])
+
+    # Parse Arguments
+    print("Reading command line arguments...")
+    parser = argparse.ArgumentParser(usage=usage_stm)
+    parser.add_argument("-f", dest="root_feature", default="")
+    parser.add_argument("-m", dest="root_model", default="")
+    parser.add_argument("-d", dest="dbscan", action="store_true", default=False)
+    parser.add_argument("-k", dest="kmeans", action="store_true", default=False)
+    parser.add_argument("-n", dest="knn", action="store_true", default=False)
+    parser.add_argument("-r", dest="rf", action="store_true", default=False)
+    parser.add_argument("-s", dest="spectral", action="store_true", default=False)
+    args = parser.parse_args()
+
+    # Error checking command line args
+    print("Performing error checking on command line arguments...")
+    done = False
+    if args.root_feature == "":
+        done = True
+        print("%sError: Features directory required.%s" % (RED, END))
+    elif not os.path.isdir(args.root_feature):
+        done = True
+        print("%sError: The features directory \"%s\" does not exist.%s" % (RED, args.root_features, END))
+    else:
+        root_feature = args.root_feature
+
+    if args.root_model == "":
+        done = True
+        print("%sError: Model directory required.%s" % (RED, END))
+    else:
+        root_model = args.root_model
+
+    if args.dbscan:
+        model_list.append("dbscan")
+
+    if args.kmeans:
+        model_list.append("kmeans")
+
+    if args.knn:
+        model_list.append("knn")
+
+    if args.rf:
+        model_list.append("rf")
+
+    if args.spectral:
+        model_list.append("spectral")
+
+    if not model_list:
+        model_list = default_models.copy()
+
+    if done:
+        print_usage()
+
+    # root_feature = sys.argv[1]
+    # root_model = sys.argv[2]
+    root_output = root_model + '/output'
+    # dir_tsne_plots = root_model + '/tsne-plots'
     if not os.path.exists(root_output):
         os.system('mkdir -pv %s' % root_output)
-        os.system('mkdir -pv %s' % dir_tsne_plots)
-        for model_alg in default_models:
+        # os.system('mkdir -pv %s' % dir_tsne_plots)
+        for model_alg in model_list:
             model_dir = '%s/%s' % (root_model, model_alg)
             if not os.path.exists(model_dir):
                 os.mkdir(model_dir)
@@ -80,7 +165,7 @@ def train_models():
     print('root_model: %s' % root_model)
     print('root_output: %s' % root_output)
     lfiles = []
-    lparas= []
+    lparas = []
     ldnames = []
     for csv_file in os.listdir(root_feature):
         if csv_file.endswith('.csv'):
@@ -102,13 +187,15 @@ def train_models():
                 off.write('%s\n' % '\t'.join(map(str, tmp_res)))
                 print('Agg saved to %s' % tmp_outfile)
     t1 = time.time()
-    print('Time to train all models for %s devices using %s threads: %.2f' % (len(lparas), 30, (t1-t0)))
+    print('Time to train all models for %s devices using %s threads: %.2f' % (len(lparas),num_pools, (t1 - t0)))
     # p.map(target=eval_individual_device, args=(lfiles, ldnames))
+
 
 def eid_wrapper(a):
     return eval_individual_device(a[0], a[1])
 
-def eval_individual_device(train_data_file, dname, specified_models = None):
+
+def eval_individual_device(train_data_file, dname, specified_models=None):
     global root_feature, root_model, root_output, dir_tsne_plots
     """
     Assumptions: the train_data_file contains only 1 device, all possible states(tags); the models can only be 
@@ -119,7 +206,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
     """
     Skip trained models, return if there is no model to train. 
     """
-    list_all_models = default_models
+    list_all_models = model_list
     if specified_models is not None:
         list_all_models = specified_models
 
@@ -140,7 +227,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
     if len(list_models_todo) < 1:
         print('skip %s, all models trained for alg: %s' % (dname, str(list_all_models)))
         return
-    print('Training %s using algorithm(s): %s' %  (dname, str(list_models_todo)))
+    print('Training %s using algorithm(s): %s' % (dname, str(list_models_todo)))
     train_data = pd.read_csv(train_data_file)
 
     num_data_points = len(train_data)
@@ -153,11 +240,10 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
     # Create a PCA instance: pca
     pca = PCA(n_components=20)
     principalComponents = pca.fit_transform(X_std)
-    pickle.dump(principalComponents)
     features = range(pca.n_components_)
     # Save components to a DataFrame
     PCA_components = pd.DataFrame(principalComponents)
-    X_feature = PCA_components.iloc[:,:4]
+    X_feature = PCA_components.iloc[:, :4]
     device = np.array(train_data.device)[0]
     y_labels = np.array(train_data.state)
     # y_labels, example: on, off, change_color
@@ -178,7 +264,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
     On Mar 22, 2019: deprecated LabelEncoder + OneHotEncoder
     """
     lb = LabelBinarizer()
-    lb.fit(y_labels) # collect all possible labels
+    lb.fit(y_labels)  # collect all possible labels
     y_train_bin = lb.transform(y_train)
     y_test_bin = lb.transform(y_test)
     y_test_bin_1d = np.argmax(y_test_bin, axis=1)
@@ -206,7 +292,6 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
         """
         if model_alg == 'knn':
             print('  knn: n_neighbors=%s' % num_lables)
-            print(np.shape(X_train))
             trained_model = KNeighborsClassifier(n_neighbors=num_lables)
             trained_model.fit(X_train, y_train_bin)
 
@@ -222,7 +307,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
             y_predicted_1d = trained_model.predict(X_test).round()
             if len(set(y_predicted_1d)) > 1: _silhouette = silhouette_score(X_test, y_predicted_1d)
 
-        elif model_alg=='spectral':
+        elif model_alg == 'spectral':
             print('  Spectral Clustering: n_clusters=%s' % num_lables)
             trained_model = SpectralClustering(n_clusters=num_lables, affinity='nearest_neighbors', random_state=0)
             trained_model.fit(X_train)
@@ -240,7 +325,6 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
 
         elif model_alg == 'rf':
             trained_model = RandomForestClassifier(n_estimators=1000, random_state=42)
-            print(np.shape(X_train))
             trained_model.fit(X_train, y_train_bin)
             y_predicted = trained_model.predict(X_test).round()
             # print(y_predicted)
@@ -248,12 +332,16 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
                 y_predicted_1d = y_predicted
             else:
                 y_predicted_1d = np.argmax(y_predicted, axis=1)
+            y_predicted_label = lb.inverse_transform(y_predicted)
+        # print('')
+        # print(y_test_bin_1d)
+        # print(y_predicted_1d)
         _acc_score = accuracy_score(y_test_bin_1d, y_predicted_1d)
         """
         Eval clustering based metrics
         """
 
-        _homogeneity=-1
+        _homogeneity = -1
         _complete = -1
         _vmeasure = -1
         _ari = -1
@@ -271,12 +359,11 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
         """
         Plot tSNE graph
         """
-        figfile = '%s/%s-%s.png' % (dir_tsne_plots, model_alg, dname)
-        pp = 30 # perplexity
+        figfile = '%s/%s/%s-%s.png' % (root_model, model_alg, model_alg, dname)
+        pp = 30  # perplexity
         if num_data_points > 200:
             pp = 50
         tsne_plot(X_feature, y_labels, figfile, pp)
-
 
         """
         Save the model 
@@ -300,7 +387,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
             off.write('%s\n' % ','.join(map(str, y_test_bin_1d)))
             off.write('%s\n' % ','.join(map(str, y_predicted_1d)))
 
-        ret_results.append([output_file, dname, _acc_score,_homogeneity, _complete, _vmeasure,
+        ret_results.append([output_file, dname, _acc_score, _homogeneity, _complete, _vmeasure,
                             _ari, _noise, _silhouette])
         """
         Print to Terminal 
@@ -318,6 +405,7 @@ def eval_individual_device(train_data_file, dname, specified_models = None):
         print('    measures saved to: %s' % single_outfile)
     return ret_results
     # return score, _homogeneity, _complete, _vmeausre, _ari
+
 
 def tsne_plot(X, y, figfile, pp=30):
     tsne = TSNE(n_components=2, perplexity=pp, n_iter=5000)
@@ -346,10 +434,11 @@ def tsne_plot(X, y, figfile, pp=30):
     print('\tSaved the tSNE plot to %s' % figfile)
     plt.savefig(figfile, bbox_inches="tight")
 
+
 def test():
     pc_name = os.uname()[1]
     """
-    Test in AKM's local laptop
+    Test in JJ's local laptop
     """
     if pc_name == 'Abhijits-MBP-2.fios-router.home':
         # train_individual_device('/net/data/meddle/moniotr/tagged-features/cloudcam.csv',
@@ -365,6 +454,6 @@ def test():
 
 if __name__ == '__main__':
     main()
-    num_pools=12
+    num_pools = 12
 
 

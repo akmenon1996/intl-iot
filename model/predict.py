@@ -177,10 +177,7 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
         return
     extra_cols = ['device', 'state']
     extra_cols.extend(col_data_points)
-    # print(extra_cols)
-    # print(extra_cols, 'extra_cols: ')
-    # print('==== feature_data ===')
-    # print(feature_data)
+
     # TODO : Make Model Pipeline more scalable from eval_models_all --> model_pipeline_example.ipynb
     unknown_data = feature_data.drop(extra_cols, axis=1)
     unknown_data = StandardScaler().fit_transform(unknown_data)
@@ -195,21 +192,9 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
 
     unknown_data = unknown_data.values[0]
     unknown_data= unknown_data.reshape(1,-1)
-    # print('==== unknown data ==== ')
-    # print(unknown_data)
     y_predict = trained_model.predict(unknown_data)
-    # y_predict = trained_model.predict_proba(unknown_data)
-    # print('Trained Model: %s'% trained_model)
-    # print('To predict shape:')
-    # print(unknown_data.shape)
-    #
-    # print('ypredict:')
-    # print(y_predict)
     p_readable = []
     theta = 0.7
-    # print(y_predict.ndim, 'ndim: ')
-    # if y_predict.ndim == 1:
-    #     return
 
     """
     Convert one hot encoding to labels, use a threshold to filter low confident predictions
