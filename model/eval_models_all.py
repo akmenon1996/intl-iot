@@ -249,7 +249,9 @@ def eval_individual_device(train_data_file, dname, specified_models=None):
     """
     Split data set into train & test, default fraction is 30% test
     """
-    X_train, X_test, y_train, y_test = train_test_split(X_feature, y_labels, test_size=.3, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X_feature, y_labels,
+                                                        test_size=.3,
+                                                        random_state=42)
     print('Train: %s' % len(X_train))
     print('Test: %s' % len(X_test))
 

@@ -52,6 +52,7 @@ def main():
     file_result = sys.argv[3]
     dir_models = sys.argv[4]
 
+
     errors = False
     if not pcap_path.endswith('.pcap'):
         print("%sError: %s is not a pcap file.%s" % (RED, pcap_path, END))
@@ -110,7 +111,7 @@ def predict(device, file_intermediate):
     print(res_detect)
     return res_detect
 
-def detect_states(intermediate_file, trained_model, labels, dname=None):
+def detect_states(intermediate_file, trained_model, labels, dname=None, model_type = 'knn'):
     group_size = 100
     warnings.simplefilter("ignore", category=DeprecationWarning)
     if not os.path.exists(intermediate_file):
@@ -179,13 +180,13 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
     extra_cols = ['device', 'state']
     extra_cols.extend(col_data_points)
 
-    # TODO : Make Model Pipeline more scalable from eval_models_all --> model_pipeline_example.ipynb
     unknown_data = feature_data.drop(extra_cols, axis=1)
     unknown_data = ss.transform(unknown_data)
     unknown_data = pca.transform(unknown_data)
     unknown_data = pd.DataFrame(unknown_data)
     unknown_data = unknown_data.iloc[:, :4]
     y_predict = trained_model.predict(unknown_data)
+    print(y_predict)
     p_readable = []
     theta = 0.7
 
@@ -194,8 +195,10 @@ def detect_states(intermediate_file, trained_model, labels, dname=None):
     """
     # list_unknonw_indices = []
     # print_list(labels, 'labels: ')
+    print(labels)
     for pindex in range(len(y_predict)):
         y_max = np.max(y_predict[pindex])
+        print(y_predict[pindex])
         if y_max < theta:
             label_predicted = 'unknown'
             # list_unknonw_indices.append(pindex)
