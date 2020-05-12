@@ -117,7 +117,7 @@ def detect_states(intermediate_file, trained_model, labels, dname=None, model_ty
     if not os.path.exists(intermediate_file):
         print('reading from %s' % intermediate_file)
         return
-    feature_file = None
+    feature_file = 'sample-yi-camera-features.csv'
     ss = trained_model['standard_scaler']
     pca = trained_model['pca']
     trained_model = trained_model['trained_model']
@@ -179,7 +179,7 @@ def detect_states(intermediate_file, trained_model, labels, dname=None, model_ty
         return
     extra_cols = ['device', 'state']
     extra_cols.extend(col_data_points)
-
+    feature_data.to_csv(feature_file)
     unknown_data = feature_data.drop(extra_cols, axis=1)
     unknown_data = ss.transform(unknown_data)
     unknown_data = pca.transform(unknown_data)
@@ -188,7 +188,7 @@ def detect_states(intermediate_file, trained_model, labels, dname=None, model_ty
     y_predict = trained_model.predict(unknown_data)
     print(y_predict)
     p_readable = []
-    theta = 0.7
+    theta = 0.0
 
     """
     Convert one hot encoding to labels, use a threshold to filter low confident predictions
@@ -320,3 +320,4 @@ def print_list(l, prefix=''):
 
 if __name__ == '__main__':
     main()
+
