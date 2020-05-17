@@ -26,8 +26,10 @@ with open('/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/tagged-models/us/y
 
 # TODO: Do not hardcode dictionary. Labels need to be taken from the device.
 di ={}
+reverse_di = {}
 for i in range(len(labels)):
     di.update({labels[i]:i})
+    reverse_di.update({i:labels[i]})
 
 di.update({'anomaly':len(labels)})
 print(di)
@@ -136,13 +138,15 @@ def final_accuracy(final_data,model_path):
         os.makedirs(model_path+'/results')
     y_predict = np.array(y_predict)
     output_dict = {'predictions':y_predict,'recall':recall,'precision':precision,'f1':f1,'f2':f2}
-
     with open(model_path+'/results/final_output.txt','w') as file:
         file.write(json.dumps(output_dict,cls=NumpyEncoder))
+    return y_predict
+
+
 
 
 def main():
-    global di
+    global di,reverse_di,labels
     data_path = 'testing_data_with_anomaly.csv'
     root_model = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/anomaly_data'
     base_model_path = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/tagged-models/us/yi-cameraknn.model'
@@ -161,8 +165,12 @@ def main():
     anomalous_data['predictions'] = di['anomaly']
     normal_data = action_classification_model(normal_data,action_classification_model_dict)
     final_data = normal_data.append(anomalous_data).sort_index()
-    final_accuracy(final_data,root_model)
-
+    y_predict = final_accuracy(final_data,root_model)
+    arr = list(range(0,len(y_predict)))
+    out_dict = {'timestep':arr,'prediction':y_predict}
+    out_df = pd.DataFrame(out_dict)
+    out_df['prediction'] = out_df['prediction'].map(reverse_di).fillna("anomaly")
+    out_df.to_csv(root_model+'/results/model_results.csv', index=False)
 
 if __name__ == '__main__':
     main()
