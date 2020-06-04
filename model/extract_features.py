@@ -121,7 +121,7 @@ def prepare_features():
             group_size = paras[2]
             device = paras[3]
             state = paras[4]
-            tmp_data = load_features_per_exp(full_intermediate_file, feature_file, group_size, device, state)
+            tmp_data =  load_features_per_exp(full_intermediate_file, feature_file, group_size, device, state)
             if tmp_data is None or len(tmp_data) == 0:
                 continue
             list_data.append(tmp_data)
