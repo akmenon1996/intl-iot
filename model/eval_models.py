@@ -40,8 +40,8 @@ root_model/output/result_{alg}.txt
 """
 warnings.simplefilter("ignore", category=DeprecationWarning)
 
-root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/features-testing1.1/us'
-root_model = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/models_new_all/features-testing1.1-all/us'
+root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/timestep-features/us'
+root_model = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/timestep-model/timestep-features-knn/us'
 
 root_output = root_model + '/output'
 dir_tsne_plots = root_model + '/tsne-plots'
@@ -50,8 +50,8 @@ num_pools = 12
 
 # default_models = ['rf']
 # default_models = ['rf', 'knn']
-default_models = ['dbscan', 'kmeans', 'knn', 'rf', 'spectral']
-# default_models = ['knn']
+#default_models = ['dbscan', 'kmeans', 'knn', 'rf', 'spectral']
+default_models = ['knn']
 model_list = []
 
 RED = "\033[31;1m"

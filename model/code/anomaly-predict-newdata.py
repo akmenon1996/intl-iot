@@ -16,7 +16,7 @@ np.random.seed(42)
 
 
 labels = []
-with open('/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/tagged-models/us/yi-camera.label.txt') as ff:
+with open('/Users/abhijit/IOT_Project/intl-iot/timestep-model/timestep-features-knn/us/knn/google-home.label.txt') as ff:
     for line in ff.readlines():
         line = line.strip()
         if line.startswith('#') or line == '':
@@ -128,10 +128,10 @@ def final_accuracy(final_data,model_path):
 
 def main():
     global di,reverse_di,labels
-    data_path = '/Volumes/Abhijit-Seagate/Data_iot/features-required-split-timestampped/yi-camera.csv'
-    root_model = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/anomaly_data_new'
-    base_model_path = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/tagged-models/us/yi-cameraknn.model'
-    anomaly_model_path = 'multivariate_model.pkl'
+    data_path = '/Volumes/Abhijit-Seagate/Data_iot/features-regular-split/google-home.csv'
+    root_model = '/Volumes/Abhijit-Seagate/Data_iot/results_google_mini'
+    base_model_path = '/Users/abhijit/IOT_Project/intl-iot/timestep-model/timestep-features-knn/us/knn/google-homeknn.model'
+    anomaly_model_path = '/Users/abhijit/IOT_Project/intl-iot/timestep-model/anomaly_models/multivariate_model_google_mini.pkl'
 
 
     num_pools = 12
@@ -140,12 +140,15 @@ def main():
     anomaly_data = load_data(data_path)
     start_time = anomaly_data['start_time']
     end_time = anomaly_data['end_time']
-    anomaly_data = anomaly_data.drop(['device','start_time','end_time'], axis=1)
-    print(anomaly_data.head())
+    anomaly_data = anomaly_data.drop(['device'], axis=1)
     action_classification_model_dict = pickle.load(open(base_model_path,'rb'))
     ss = action_classification_model_dict['standard_scaler']
     anomaly_model = pickle.load(open(anomaly_model_path,'rb'))
     normal_data,anomalous_data = filter_anomaly(ss,anomaly_data, anomaly_model,root_model)
+    print("Normal")
+    print(normal_data.head())
+    print("Abnormal")
+    print(anomalous_data.head())
     #TODO: The label for anomalous data will be according to the dictionary count for the device.
     anomalous_data['predictions'] = di['anomaly']
     normal_data = action_classification_model(normal_data,action_classification_model_dict)
