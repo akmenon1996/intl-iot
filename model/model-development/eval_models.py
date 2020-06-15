@@ -40,8 +40,8 @@ root_model/output/result_{alg}.txt
 """
 warnings.simplefilter("ignore", category=DeprecationWarning)
 
-root_feature = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/model/timestep-features/us'
-root_model = '/Users/abhijit/Desktop/GIT_Projects/intl-iot/timestep-model/timestep-features-knn/us'
+root_feature = '/Volumes/Abhijit-Seagate/Data_iot/Features/required-features-split'
+root_model = '/Volumes/Abhijit-Seagate/Data_iot/models/new-tagged-models'
 
 root_output = root_model + '/output'
 dir_tsne_plots = root_model + '/tsne-plots'

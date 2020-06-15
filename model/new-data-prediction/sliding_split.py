@@ -1,9 +1,38 @@
-import os
+import os,sys
 import math
 from multiprocessing import Process
 
-src = "/Users/abhijit/Desktop/test_split/data"
-dest = "/Users/abhijit/Desktop/test_split/results"
+
+RED = "\033[31;1m"
+END = "\033[0m"
+
+usage_stm = """
+Usage: python3 sliding_split.py src dest
+​
+Performs statistical analysis on decoded pcap files.
+​
+Example: python3 sliding_split.py tagged-intermediate/us/ features/us/
+​
+Arguments:
+  src:       path to a directory containing text files of intermediate data
+  dest: path to the directory to write split intermediate data
+​"""
+
+#isError is either 0 or 1
+def print_usage(isError):
+    if isError == 0:
+        print(usage_stm)
+    else:
+        print(usage_stm, file=sys.stderr)
+    exit(isError)
+
+src = sys.argv[1]
+dest = sys.argv[2]
+
+for arg in sys.argv:
+    if arg in ("-h", "--help"):
+        print_usage(0)
+
 num_proc = 8
 time_window = 30
 slide_int = 5

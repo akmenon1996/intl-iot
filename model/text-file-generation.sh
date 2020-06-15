@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-cd /Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/iot-data/us
+cd /Volumes/Abhijit-Seagate/Data_iot/iot-data/us/wink-hub2
 
-find "$(pwd)" -name "*.pcap" > /Users/abhijit/Desktop/GIT_Projects/Original_iot/intl-iot/model/new_test.txt
+find "$(pwd)" -name "*.pcap" > /Volumes/Abhijit-Seagate/Data_iot/list-exp-wink-labelled.txt

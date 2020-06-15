@@ -12,3 +12,5 @@ Definition of the device activity: tag name
 Download [Google Drive > iot-model.tgz](https://drive.google.com/open?id=1lMqZ5qx6ATqIIiLOdTYcSm6RliK1F7vA) (size=~127MB) before running juypter notebook.
 
 [model_sample.ipynb](model_sample.ipynb) walks you through steps that trains a model from traffic of experiments and uses the model to classify (predict) a new traffic observed.
+
+To build and test on new and untagged data follow steps from here [steps_to_prediction.md](steps_to_prediction.md)

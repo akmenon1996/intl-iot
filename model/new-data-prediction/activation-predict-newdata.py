@@ -9,14 +9,15 @@ from matplotlib import pyplot as plt,style
 from multiprocessing import Pool
 import json
 import os
+import sys
 warnings.simplefilter("ignore", category=DeprecationWarning)
 style.use('ggplot')
 np.random.seed(42)
 
 
-
+label_file = sys.argv[5]
 labels = []
-with open('/Users/abhijit/IOT_Project/intl-iot/timestep-model/timestep-features-knn/us/knn/google-home.label.txt') as ff:
+with open(label_file) as ff:
     for line in ff.readlines():
         line = line.strip()
         if line.startswith('#') or line == '':
@@ -119,8 +120,6 @@ def final_accuracy(final_data,model_path):
     global di
     y_test = final_data['state'].map(di)
     y_predict = final_data['predictions']
-
-
     return y_predict
 
 
@@ -128,12 +127,15 @@ def final_accuracy(final_data,model_path):
 
 def main():
     global di,reverse_di,labels
-    data_path = '/Volumes/Abhijit-Seagate/Data_iot/features-regular-split/google-home.csv'
-    root_model = '/Volumes/Abhijit-Seagate/Data_iot/results_google_mini'
-    base_model_path = '/Users/abhijit/IOT_Project/intl-iot/timestep-model/timestep-features-knn/us/knn/google-homeknn.model'
-    anomaly_model_path = '/Users/abhijit/IOT_Project/intl-iot/timestep-model/anomaly_models/multivariate_model_google_mini.pkl'
+    data_path = '/Volumes/Abhijit-Seagate/Data_iot/Features/required-features-split/google-home-mini-req-april.csv'
+    root_model = '/Volumes/Abhijit-Seagate/Data_iot/results/results_google_mini_idle_req'
+    base_model_path = '/Volumes/Abhijit-Seagate/Data_iot/models/new-tagged-models/knn/google-home-miniknn.model'
+    anomaly_model_path = '/Volumes/Abhijit-Seagate/Data_iot/tagged-models/anomaly_models/multivariate_model_google_home_mini_req.pkl'
 
-
+    data_path = sys.argv[1]
+    root_model = sys.argv[2]
+    base_model_path = sys.argv[3]
+    anomaly_model_path = sys.argv[4]
     num_pools = 12
     p = Pool(num_pools)
 
