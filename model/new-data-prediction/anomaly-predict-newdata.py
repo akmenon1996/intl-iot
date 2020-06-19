@@ -14,7 +14,19 @@ warnings.simplefilter("ignore", category=DeprecationWarning)
 style.use('ggplot')
 np.random.seed(42)
 
+usage_stm = """
+Usage: python {prog_name} data_path root_model base_model_path anomaly_model_path
 
+data_path = Feature file of the device for which you want predictions. 
+root_model = Path where you want the model results to be saved. 
+base_model_path = Path to the knn model of the device. 
+anomaly_model_path = Path to the anomaly model of the device. 
+""".format(prog_name=sys.argv[0])
+
+
+def print_usage():
+    print(usage_stm, file=sys.stderr)
+    exit(1)
 
 label_file = sys.argv[5]
 labels = []

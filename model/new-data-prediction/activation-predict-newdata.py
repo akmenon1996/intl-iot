@@ -108,6 +108,8 @@ def action_classification_model(normal_data,action_class_dict):
     pca = action_class_dict['pca']
     trained_model = action_class_dict['trained_model']
     transformed_data = ss.transform(normal_data.drop(['state','anomalous'], axis=1))
+    #TODO: Fix nan value results from transformations
+
     transformed_data = pca.transform(transformed_data)
     transformed_data = pd.DataFrame(transformed_data)
     transformed_data = transformed_data.iloc[:, :4]
@@ -156,7 +158,6 @@ def main():
     normal_data = action_classification_model(normal_data,action_classification_model_dict)
     final_data = normal_data.append(anomalous_data).sort_index()
     y_predict = final_accuracy(final_data,root_model)
-    arr = list(range(0,len(y_predict)))
     out_dict = {'start_time':start_time,'end_time':end_time,'tagged':final_data['state'],'prediction':y_predict}
     out_df = pd.DataFrame(out_dict)
     out_df['prediction'] = out_df['prediction'].map(reverse_di).fillna("anomaly")

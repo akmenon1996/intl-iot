@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd /Volumes/Abhijit-Seagate/Data_iot/iot-idle/us/g
+cd /Volumes/Abhijit-Seagate/Data_iot/iot-idle/us/
 
 find "$(pwd)" -name "*.pcap" > /Volumes/Abhijit-Seagate/Data_iot/list-untagged-data.txt
 

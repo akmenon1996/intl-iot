@@ -10,7 +10,7 @@ column_names = ['frame_no', 'ts', 'ts_delta', 'protocols', 'frame_len', 'eth_src
                 'eth_dst', 'ip_src', 'ip_dst', 'tcp_srcport', 'tcp_dstport',
                 'http_host', 'sni', 'udp_srcport', 'udp_dstport']
 
-root = '/Volumes/Abhijit-Seagate/Data_iot/Intermediate/idle-intermediate/google-home-mini/unctrl'
+root = '/Volumes/Abhijit-Seagate/Data_iot/Intermediate/idle-intermediate/echo'
 idle_time_dict = {}
 idle_time_dict['idle'] = []
 for files in os.listdir(root):
