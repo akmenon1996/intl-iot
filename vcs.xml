@@ -10,6 +10,10 @@
           <option name="url" value="https://github.com/akmenon1996/dockerwebappdeployment.git" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="http://github.com" />
+          <option name="userName" value="akmenon1996" />
+        </UrlAndUserName>
       </list>
     </option>
     <option name="cloneParentDir" value="$USER_HOME$/Desktop/dockers" />
